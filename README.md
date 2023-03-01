@@ -5,7 +5,11 @@ Welcome!
 
 ## Group Information
 
+Lu Mingrui
 
+Liang Junyi
+
+Yang Haocheng
 
 ## Labs
 Your project consists of four labs. You are *strongly advised* to start early.  
