@@ -9,6 +9,8 @@ import java.io.Serializable;
 public class RecordId implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private PageId pid;
+    private int tupleno;
 
     /**
      * Creates a new RecordId referring to the specified PageId and tuple
@@ -21,6 +23,8 @@ public class RecordId implements Serializable {
      */
     public RecordId(PageId pid, int tupleno) {
         // some code goes here
+        this.pid = pid;
+        this.tupleno = tupleno;
     }
 
     /**
@@ -28,7 +32,7 @@ public class RecordId implements Serializable {
      */
     public int getTupleNumber() {
         // some code goes here
-        return 0;
+        return tupleno;
     }
 
     /**
@@ -36,7 +40,7 @@ public class RecordId implements Serializable {
      */
     public PageId getPageId() {
         // some code goes here
-        return null;
+        return pid;
     }
 
     /**
@@ -48,8 +52,22 @@ public class RecordId implements Serializable {
     @Override
     public boolean equals(Object o) {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
+        if (o == null) {
+            return false;
+            }
+        if (!(o instanceof RecordId)) {
+            return false;
+            }
+        RecordId other = (RecordId) o;
+        if (other.pid != this.pid){
+            return false;
+            }
+        if (other.tupleno != this.tupleno){
+            return false;
+            }
+        return true;
     }
+    
 
     /**
      * You should implement the hashCode() so that two equal RecordId instances
@@ -60,8 +78,10 @@ public class RecordId implements Serializable {
     @Override
     public int hashCode() {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
-
+        String pidstr = Integer.toString(pid.hashCode());
+        String tuplenostr = Integer.toString(tupleno);
+        String hash = pidstr + tuplenostr;
+        return hash.hashCode();
     }
 
 }
