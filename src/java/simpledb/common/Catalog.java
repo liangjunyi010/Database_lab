@@ -52,6 +52,10 @@ public class Catalog {
             this.table_name = table_name;
             this.table_id = table_id;
         }
+
+        public Help_key(){
+
+        }
     }
 
     private Map<Help_key,Help_table> catalog_List;
@@ -79,26 +83,16 @@ public class Catalog {
         Help_table help_table = new Help_table(file,name,pkeyField);
         Help_key help_key = new Help_key(name, file.getId());
         
+        Help_key key_rm = new Help_key();
         for (Help_key key :this.catalog_List.keySet()) {
-            System.out.println(key.table_name);
-        }
-
-        for (Help_key key :this.catalog_List.keySet()) {
-            if (key.table_id == file.getId() | key.table_name == name){
-                Help_key help_key_rm = new Help_key(key.table_name,key.table_id);
-                this.catalog_List.remove(help_key_rm);
-            }
-
-            if (key.table_name.equals(name)){
-                Help_key help_key_rm = new Help_key(key.table_name,key.table_id);
-                this.catalog_List.remove(help_key_rm);
+            if (key.table_id == file.getId() | key.table_name.equals(name)){
+                // this.catalog_List.remove(key);
+                key_rm = key;
             }
 
         }
-        System.out.println("#################");
-        for (Help_key key :this.catalog_List.keySet()) {
-            System.out.println(key.table_name);
-        }
+
+        this.catalog_List.remove(key_rm);
         this.catalog_List.put(help_key, help_table);
 
     }
@@ -176,7 +170,11 @@ public class Catalog {
 
     public Iterator<Integer> tableIdIterator() {
         // some code goes here
-        return null;
+        List<Integer> tableIds = new ArrayList<>();
+        for (Help_key key : catalog_List.keySet()) {
+        tableIds.add(key.table_id);
+        }
+        return tableIds.iterator();
     }
 
     public String getTableName(int id) {

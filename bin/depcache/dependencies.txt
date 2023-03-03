@@ -473,6 +473,7 @@ java.io.IOException
 java.util.UUID
 [Ljava.lang.String;
 java.io.File
+java.util.List
 simpledb.common.Catalog$Help_key
 simpledb.common.Catalog
 simpledb.storage.HeapFile
@@ -1896,8 +1897,10 @@ java.lang.invoke.StringConcatFactory
 java.nio.channels.FileChannel
 ||:simpledb.CatalogTest
 simpledb.systemtest.SimpleDbTestBase
+java.io.PrintStream
 simpledb.TestUtil
 simpledb.TestUtil$SkeletonFile
+java.lang.System
 junit.framework.JUnit4TestAdapter
 java.util.Random
 simpledb.common.Utility

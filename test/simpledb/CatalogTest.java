@@ -83,6 +83,7 @@ public class CatalogTest extends SimpleDbTestBase {
     @Test public void handleDuplicateNames() {
     	int id3 = r.nextInt();
     	Database.getCatalog().addTable(new SkeletonFile(id3, Utility.getTupleDesc(2)), name);
+        
     	assertEquals(id3, Database.getCatalog().getTableId(name));
     }
     
