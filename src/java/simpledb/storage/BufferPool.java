@@ -1,15 +1,22 @@
 package simpledb.storage;
 
+import simpledb.common.Catalog;
 import simpledb.common.Database;
 import simpledb.common.Permissions;
+import simpledb.common.Catalog.Help_key;
 import simpledb.common.DbException;
 import simpledb.common.DeadlockException;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
 
 import java.io.*;
-
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * BufferPool manages the reading and writing of pages into memory from
@@ -33,13 +40,23 @@ public class BufferPool {
     constructor instead. */
     public static final int DEFAULT_PAGES = 50;
 
+    private final int numPages;
+    private Map<PageId, Page> bp_List;
+
+    private int cur_num_pages;
+
+
     /**
      * Creates a BufferPool that caches up to numPages pages.
      *
      * @param numPages maximum number of pages in this buffer pool.
      */
+    
     public BufferPool(int numPages) {
         // some code goes here
+        this.numPages = numPages;
+        this.bp_List = new HashMap<>(numPages);
+        
     }
     
     public static int getPageSize() {
@@ -71,10 +88,24 @@ public class BufferPool {
      * @param pid the ID of the requested page
      * @param perm the requested permissions on the page
      */
-    public  Page getPage(TransactionId tid, PageId pid, Permissions perm)
+    public Page getPage(TransactionId tid, PageId pid, Permissions perm)
         throws TransactionAbortedException, DbException {
         // some code goes here
+        for (PageId pageid :this.bp_List.keySet()){
+            if (pid.equals(pageid)){
+                return this.bp_List.get(pageid) ;
+            }
+        }
+        for (Help_key key :Catalog.catalog_List.keySet()) {
+            if(key.table_id == pid.getTableId()){
+                if(this.bp_List.size() < this.numPages){
+                    this.bp_List.put(pid, Catalog.catalog_List.get(key).table_file.readPage(pid));
+                }
+                return Catalog.catalog_List.get(key).table_file.readPage(pid);
+            } 
+        }
         return null;
+
     }
 
     /**
@@ -86,7 +117,7 @@ public class BufferPool {
      * @param tid the ID of the transaction requesting the unlock
      * @param pid the ID of the page to unlock
      */
-    public  void unsafeReleasePage(TransactionId tid, PageId pid) {
+    public void unsafeReleasePage(TransactionId tid, PageId pid) {
         // some code goes here
         // not necessary for lab1|lab2
     }

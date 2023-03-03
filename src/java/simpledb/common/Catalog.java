@@ -58,7 +58,7 @@ public class Catalog {
         }
     }
 
-    private Map<Help_key,Help_table> catalog_List;
+    public static Map<Help_key,Help_table> catalog_List;
 
     /**
      * Constructor.
@@ -248,4 +248,3 @@ public class Catalog {
         }
     }
 }
-

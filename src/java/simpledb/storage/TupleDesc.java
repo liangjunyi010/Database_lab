@@ -32,16 +32,7 @@ public class TupleDesc implements Serializable {
             this.fieldType = t;
         }
 
-            /**
-     * Compares the specified object with this TupleDesc for equality. Two
-     * TupleDescs are considered equal if they have the same number of items
-     * and if the i-th type in this TupleDesc is equal to the i-th type in o
-     * for every i.
-     * 
-     * @param o
-     *            the Object to be compared for equality with this TupleDesc.
-     * @return true if the object is equal to this TupleDesc.
-     */
+        
         public boolean equals(Object o) {
             // some code goes here
             if (o == this) {
@@ -64,7 +55,7 @@ public class TupleDesc implements Serializable {
     }
 
     /**
-     * 一个用于存储TDItem的list，供内部使用
+     * a list used to store TDItem
      */
     public List<TDItem> tditem_list = new ArrayList<TDItem>();
 
