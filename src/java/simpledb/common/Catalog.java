@@ -23,12 +23,46 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Catalog {
 
+
+    public class Help_table{
+
+        public DbFile table_file;
+        public String table_name;
+        public String table_pkeyField;
+
+        public Help_table(DbFile table_file, String table_name,String table_pkeyField ) {
+            this.table_file = table_file;
+            this.table_name = table_name;
+            this.table_pkeyField = table_pkeyField;
+        }
+        public Help_table(DbFile table_file, String table_name) {
+            this.table_file = table_file;
+            this.table_name = table_name;
+        }
+        public Help_table(DbFile table_file) {
+            this.table_file = table_file;
+        }
+    }
+
+    public class Help_key{
+        public String table_name;
+        public Integer table_id;
+
+        public Help_key(String table_name, Integer table_id){
+            this.table_name = table_name;
+            this.table_id = table_id;
+        }
+    }
+
+    private Map<Help_key,Help_table> catalog_List;
+
     /**
      * Constructor.
      * Creates a new, empty catalog.
      */
     public Catalog() {
         // some code goes here
+        this.catalog_List = new HashMap<Help_key,Help_table>();
     }
 
     /**
@@ -42,6 +76,31 @@ public class Catalog {
      */
     public void addTable(DbFile file, String name, String pkeyField) {
         // some code goes here
+        Help_table help_table = new Help_table(file,name,pkeyField);
+        Help_key help_key = new Help_key(name, file.getId());
+        
+        for (Help_key key :this.catalog_List.keySet()) {
+            System.out.println(key.table_name);
+        }
+
+        for (Help_key key :this.catalog_List.keySet()) {
+            if (key.table_id == file.getId() | key.table_name == name){
+                Help_key help_key_rm = new Help_key(key.table_name,key.table_id);
+                this.catalog_List.remove(help_key_rm);
+            }
+
+            if (key.table_name.equals(name)){
+                Help_key help_key_rm = new Help_key(key.table_name,key.table_id);
+                this.catalog_List.remove(help_key_rm);
+            }
+
+        }
+        System.out.println("#################");
+        for (Help_key key :this.catalog_List.keySet()) {
+            System.out.println(key.table_name);
+        }
+        this.catalog_List.put(help_key, help_table);
+
     }
 
     public void addTable(DbFile file, String name) {
@@ -65,7 +124,12 @@ public class Catalog {
      */
     public int getTableId(String name) throws NoSuchElementException {
         // some code goes here
-        return 0;
+        for (Help_key key :this.catalog_List.keySet()) {
+            if (key.table_name.equals(name)){
+                return key.table_id;
+            }
+        }
+        throw new NoSuchElementException();
     }
 
     /**
@@ -76,7 +140,12 @@ public class Catalog {
      */
     public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
         // some code goes here
-        return null;
+        for (Help_key key :this.catalog_List.keySet()) {
+            if (key.table_id == tableid){
+                return this.catalog_List.get(key).table_file.getTupleDesc();
+            }
+        }
+        throw new NoSuchElementException();
     }
 
     /**
@@ -87,12 +156,22 @@ public class Catalog {
      */
     public DbFile getDatabaseFile(int tableid) throws NoSuchElementException {
         // some code goes here
-        return null;
+        for (Help_key key :this.catalog_List.keySet()) {
+            if (key.table_id == tableid){
+                return this.catalog_List.get(key).table_file;
+            }
+        }
+        throw new NoSuchElementException();
     }
 
     public String getPrimaryKey(int tableid) {
         // some code goes here
-        return null;
+        for (Help_key key :this.catalog_List.keySet()) {
+            if (key.table_id == tableid){
+                return this.catalog_List.get(key).table_pkeyField;
+            }
+        }
+        throw new NoSuchElementException();
     }
 
     public Iterator<Integer> tableIdIterator() {
@@ -102,12 +181,18 @@ public class Catalog {
 
     public String getTableName(int id) {
         // some code goes here
-        return null;
+        for (Help_key key :this.catalog_List.keySet()) {
+            if (key.table_id == id){
+                return this.catalog_List.get(key).table_name;
+            }
+        }
+        throw new NoSuchElementException();
     }
     
     /** Delete all tables from the catalog */
     public void clear() {
         // some code goes here
+        this.catalog_List.clear();
     }
     
     /**
