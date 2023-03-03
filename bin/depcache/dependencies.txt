@@ -280,6 +280,7 @@ java.util.Collection
 java.util.HashMap
 java.lang.StringBuilder
 java.lang.Object
+java.lang.IllegalArgumentException
 simpledb.storage.Field
 simpledb.storage.TupleDesc
 java.io.Serializable

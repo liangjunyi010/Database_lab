@@ -32,9 +32,35 @@ public class TupleDesc implements Serializable {
             this.fieldType = t;
         }
 
+            /**
+     * Compares the specified object with this TupleDesc for equality. Two
+     * TupleDescs are considered equal if they have the same number of items
+     * and if the i-th type in this TupleDesc is equal to the i-th type in o
+     * for every i.
+     * 
+     * @param o
+     *            the Object to be compared for equality with this TupleDesc.
+     * @return true if the object is equal to this TupleDesc.
+     */
+        public boolean equals(Object o) {
+            // some code goes here
+            if (o == this) {
+                return true;
+            }
+            if (!(o instanceof TDItem)) {
+                return false;
+            }
+            TDItem other = (TDItem) o;
+            if (this.fieldName == other.fieldName & (this.fieldType == other.fieldType)){
+                return true;
+            }
+            return false;
+        }
+
         public String toString() {
             return fieldName + "(" + fieldType + ")";
         }
+
     }
 
     /**
@@ -142,6 +168,15 @@ public class TupleDesc implements Serializable {
      */
     public int fieldNameToIndex(String name) throws NoSuchElementException {
         // some code goes here
+        int flag = 0;
+        for(int i = 0;i<this.tditem_list.size();i++){
+            if(this.tditem_list.get(i).fieldName == null){
+                flag = 1;
+            }
+        }
+        if (flag == 1){
+            throw new NoSuchElementException();
+        }
         for(int i = 0;i<this.tditem_list.size();i++){
             if(this.tditem_list.get(i).fieldName.equals(name)){
                 return i;
