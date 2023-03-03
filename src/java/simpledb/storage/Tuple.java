@@ -16,7 +16,7 @@ public class Tuple implements Serializable {
     private static final long serialVersionUID = 1L;
     private TupleDesc td;
     private RecordId recordId;
-    private Map<String,Field> tuple_data = new HashMap<String,Field>();
+    private Map<Integer,Field> tuple_data = new HashMap<Integer,Field>();
     /**
      * Create a new tuple with the specified schema (type).
      *
@@ -74,7 +74,7 @@ public class Tuple implements Serializable {
      */
     public void setField(int i, Field f) {
         // some code goes here
-        this.tuple_data.put(this.td.tditem_list.get(i).fieldName, f);
+        this.tuple_data.put(i, f);
     }
 
     /**
@@ -85,7 +85,7 @@ public class Tuple implements Serializable {
      */
     public Field getField(int i) {
         // some code goes here
-        Field f = this.tuple_data.get(this.td.tditem_list.get(i).fieldName); 
+        Field f = this.tuple_data.get(i);
         return f;
     }
 
