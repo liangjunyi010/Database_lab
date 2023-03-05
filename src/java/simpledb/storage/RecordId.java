@@ -59,7 +59,7 @@ public class RecordId implements Serializable {
             return false;
             }
         RecordId other = (RecordId) o;
-        if (other.pid != this.pid){
+        if ( !(other.pid.equals(this.pid))){
             return false;
             }
         if (other.tupleno != this.tupleno){

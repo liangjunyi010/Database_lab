@@ -79,7 +79,7 @@ public class HeapPage implements Page {
     private int getNumTuples() {    
         int tuple_size = td.getSize();
         int page_size = BufferPool.getPageSize();
-        int numtuples = (int) Math.floor((page_size * 8) / (tuple_size * 8 + 1));
+        int numtuples = (int) (page_size * 8) / (tuple_size * 8 + 1);
         return numtuples;
     }
 
@@ -88,7 +88,7 @@ public class HeapPage implements Page {
      * @return the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
      */
     private int getHeaderSize() {        
-        return (int) Math.ceil(this.getNumTuples() / 8);
+        return (int) Math.ceil(this.getNumTuples() / 8.0);
     }
     
     /** Return a view of this page before it was modified
@@ -121,7 +121,8 @@ public class HeapPage implements Page {
      */
     public HeapPageId getId() {
     // some code goes here
-    throw new UnsupportedOperationException("implement this");
+    return this.pid;
+    // throw new UnsupportedOperationException("implement this");
     }
 
     /**
@@ -341,7 +342,6 @@ public class HeapPage implements Page {
 
             int byteValue = header[byteIndex];
             int mask = 1 << bitIndex;
-
             return (byteValue & mask) != 0;
     }
 

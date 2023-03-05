@@ -40,7 +40,7 @@ public class BufferPool {
     constructor instead. */
     public static final int DEFAULT_PAGES = 50;
 
-    private final int numPages;
+    private int numPages;
     private Map<PageId, Page> bp_List;
 
     private int cur_num_pages;
@@ -55,7 +55,7 @@ public class BufferPool {
     public BufferPool(int numPages) {
         // some code goes here
         this.numPages = numPages;
-        this.bp_List = new HashMap<>(numPages);
+        this.bp_List = new HashMap<>();
         
     }
     
@@ -93,19 +93,22 @@ public class BufferPool {
         // some code goes here
         for (PageId pageid :this.bp_List.keySet()){
             if (pid.equals(pageid)){
-                return this.bp_List.get(pageid) ;
+                return this.bp_List.get(pageid);
             }
         }
         for (Help_key key :Catalog.catalog_List.keySet()) {
             if(key.table_id == pid.getTableId()){
                 if(this.bp_List.size() < this.numPages){
-                    this.bp_List.put(pid, Catalog.catalog_List.get(key).table_file.readPage(pid));
+                    Page newpage = Database.getCatalog().getDatabaseFile(key.table_id).readPage(pid);
+                    this.bp_List.put(pid, newpage);
+                    return newpage;
                 }
-                return Catalog.catalog_List.get(key).table_file.readPage(pid);
+                else{
+                    throw new DbException(null);
+                }
             } 
         }
         return null;
-
     }
 
     /**

@@ -87,11 +87,10 @@ public class TupleDesc implements Serializable {
     public TupleDesc(Type[] typeAr, String[] fieldAr) {
         this.tditem_list = new ArrayList<TDItem>(); // Initialize tditem_list
         // some code goes here
-        for(int i=0;i<typeAr.length;i++){
+        for(int i=0;i<fieldAr.length;i++){
             TDItem tdItem = new TDItem(typeAr[i],fieldAr[i]);
             this.tditem_list.add(tdItem);
         }
-
     }
 
     /**
@@ -133,6 +132,7 @@ public class TupleDesc implements Serializable {
         return this.tditem_list.get(i).fieldName;
     }
 
+
     /**
      * Gets the type of the ith field of this TupleDesc.
      * 
@@ -147,6 +147,8 @@ public class TupleDesc implements Serializable {
         // some code goes here
         return this.tditem_list.get(i).fieldType;
     }
+
+
 
     /**
      * Find the index of the field with a given name.
