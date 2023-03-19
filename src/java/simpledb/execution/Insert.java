@@ -1,8 +1,12 @@
 package simpledb.execution;
 
+import java.io.IOException;
+import simpledb.common.Type;
+
 import simpledb.common.Database;
 import simpledb.common.DbException;
 import simpledb.storage.BufferPool;
+import simpledb.storage.IntField;
 import simpledb.storage.Tuple;
 import simpledb.storage.TupleDesc;
 import simpledb.transaction.TransactionAbortedException;
@@ -15,6 +19,10 @@ import simpledb.transaction.TransactionId;
 public class Insert extends Operator {
 
     private static final long serialVersionUID = 1L;
+    private TransactionId t;
+    private OpIterator child;
+    private int tableId;
+    private boolean alreadyCalled = false;
 
     /**
      * Constructor.
@@ -32,23 +40,31 @@ public class Insert extends Operator {
     public Insert(TransactionId t, OpIterator child, int tableId)
             throws DbException {
         // some code goes here
+        this.t = t;
+        this.child = child;
+        this.tableId = tableId;
     }
 
     public TupleDesc getTupleDesc() {
         // some code goes here
-        return null;
+        return new TupleDesc(new Type[]{Type.INT_TYPE});
     }
 
     public void open() throws DbException, TransactionAbortedException {
         // some code goes here
+        child.open();
+        super.open();
     }
 
     public void close() {
         // some code goes here
+        super.close();
+        child.close();
     }
 
     public void rewind() throws DbException, TransactionAbortedException {
         // some code goes here
+        child.rewind();
     }
 
     /**
@@ -66,17 +82,43 @@ public class Insert extends Operator {
      */
     protected Tuple fetchNext() throws TransactionAbortedException, DbException {
         // some code goes here
-        return null;
+        // If the method has already been called, return null.
+        if (alreadyCalled) {
+            return null;
+        }
+        alreadyCalled = true; // Otherwise, mark that the method has been called.
+
+        int numTuplesInserted = 0; // Counter for number of tuples inserted.
+
+        // Retrieve buffer pool instance.
+        BufferPool bufferPool = Database.getBufferPool();
+        try{
+            while (this.child.hasNext()) {
+                Tuple tuple = this.child.next(); // Get the next tuple.
+                bufferPool.insertTuple(this.t, this.tableId, tuple); // Insert the tuple into the buffer pool.
+                numTuplesInserted++; // Increment the counter.
+            }
+        }catch(IOException ioe){
+            throw new DbException("IOException: " + ioe.getMessage());
+        }
+        // Create a new tuple with a single field for the number of tuples inserted.
+        Tuple returnTuple = new Tuple(this.getTupleDesc());
+        returnTuple.setField(0, new IntField(numTuplesInserted));
+
+        // Return the new tuple.
+        return returnTuple;
+
     }
 
     @Override
     public OpIterator[] getChildren() {
         // some code goes here
-        return null;
+        return new OpIterator[]{this.child};
     }
 
     @Override
     public void setChildren(OpIterator[] children) {
         // some code goes here
+        this.child = children[0];
     }
 }
