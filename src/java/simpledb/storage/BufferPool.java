@@ -196,6 +196,9 @@ public class BufferPool {
                 this.evictPage();
                 RAM_helper RAM_helper = new RAM_helper(page,this.randomNumber);
                 this.bp_List.put(page.getId(), RAM_helper);
+            } else if (!this.bp_List.containsKey(page.getId())) {
+                RAM_helper RAM_helper = new RAM_helper(page,this.bp_List.size());
+                this.bp_List.put(page.getId(), RAM_helper);
             }
         }
     }
