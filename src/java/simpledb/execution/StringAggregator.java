@@ -67,29 +67,30 @@ public class StringAggregator implements Aggregator {
      */
     public OpIterator iterator() {
         // some code goes here
-        TupleDesc groupAggregateTd;
+        TupleDesc tupleDesc;
         ArrayList<Tuple> tuples = new ArrayList<>();
         boolean hasGrouping = (this.gbfield != Aggregator.NO_GROUPING);
-
         if (hasGrouping) {
-            groupAggregateTd = new TupleDesc(new Type[]{this.gbfieldtype, Type.INT_TYPE});
+            tupleDesc = new TupleDesc(new Type[]{this.gbfieldtype, Type.INT_TYPE});
         } else {
-            groupAggregateTd = new TupleDesc(new Type[]{Type.INT_TYPE});
+            tupleDesc = new TupleDesc(new Type[]{Type.INT_TYPE});
         }
 
-        for (Map.Entry<Field, Integer> groupAggregateEntry : this.groupCounts.entrySet()) {
-            Tuple groupCountsTuple = new Tuple(groupAggregateTd);
+        for (Map.Entry<Field, Integer> entry : this.groupCounts.entrySet()) {
+            Tuple tuple = new Tuple(tupleDesc);
 
-            // If there is a grouping, we return a tuple in the form {groupByField, aggregateVal}
-            // If there is no grouping, we return a tuple in the form {aggregateVal}
             if (hasGrouping) {
-                groupCountsTuple.setField(0, groupAggregateEntry.getKey());
-                groupCountsTuple.setField(1, new IntField(groupAggregateEntry.getValue()));
+                tuple.setField(0, entry.getKey());
+                tuple.setField(1, new IntField(entry.getValue()));
             } else {
-                groupCountsTuple.setField(0, new IntField(groupAggregateEntry.getValue()));
+                tuple.setField(0, new IntField(entry.getValue()));
             }
-            tuples.add(groupCountsTuple);
+            tuples.add(tuple);
         }
-        return new TupleIterator(groupAggregateTd, tuples);
+        if (tuples.isEmpty()) {
+            return new TupleIterator(tupleDesc, new ArrayList<Tuple>());
+        } else {
+            return new TupleIterator(tupleDesc, tuples);
+        }
     }
 }
