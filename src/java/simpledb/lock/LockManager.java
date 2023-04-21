@@ -3,15 +3,23 @@ package simpledb.lock;
 import simpledb.storage.PageId;
 import simpledb.transaction.TransactionAbortedException;
 import simpledb.transaction.TransactionId;
-
-import java.util.*;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
 
+ ReadAndWriteLock class provides a simple implementation of a read-write lock.
+ It allows multiple transactions to read a shared resource at the same time
+ while ensuring that only one transaction has the ability to write or modify the resource
+ at any given time.
+ This class keeps track of the set of transactions that hold the lock,
+ the number of readers, and the number of writers that are waiting to acquire the lock.
+ The implementation of readLock() and writeLock() methods guarantees fairness
+ and prevents starvation by using a synchronized wait-notify mechanism.
+ This class is used by LockManager to control access to database pages in a concurrent manner.
+ */
 class ReadAndWriteLock {
     Set<TransactionId> lockusers;
     Map<TransactionId, Boolean> lockwaiters;
@@ -19,6 +27,12 @@ class ReadAndWriteLock {
     private int readNum;
     private int writeNum;
 
+    /**
+     Creates a new instance of ReadAndWriteLock with initial values for its fields:
+     isWrite is set to false, readNum and writeNum are set to 0,
+     lockusers is initialized to a new HashSet of TransactionId objects, and
+     lockwaiters is initialized to a new HashMap with TransactionId keys and Boolean values.
+     */
     public ReadAndWriteLock() {
         this.isWrite = false;
         this.readNum = 0;
@@ -27,10 +41,23 @@ class ReadAndWriteLock {
         this.lockwaiters = new HashMap<TransactionId, Boolean>();
     }
 
+    /**
+     Returns true if the given transaction currently holds the lock.
+     @param tid the transaction ID to check if it holds the lock
+     @return true if the transaction holds the lock, false otherwise
+     */
     public boolean holdBy(TransactionId tid) {
         return this.lockusers.contains(tid);
     }
 
+    /**
+     Acquires a read lock on this ReadAndWriteLock instance for the specified transaction id.
+     If the transaction already holds the read lock, or a write lock is held by another transaction,
+     the method returns immediately. Otherwise, the method waits until there are no write locks
+     held by other transactions before granting the read lock to the transaction.
+     @param tid the transaction id that is requesting the read lock
+     @throws InterruptedException if the current thread is interrupted while waiting for the read lock
+     */
     public void readLock(TransactionId tid) throws InterruptedException {
         if (this.lockusers.contains(tid) & !this.isWrite) {
             return;
@@ -48,6 +75,14 @@ class ReadAndWriteLock {
         this.lockwaiters.remove(tid);
     }
 
+    /**
+     Acquires the write lock if it's available, otherwise waits until it's available.
+     If the calling transaction already holds the write lock, returns immediately.
+     If the calling transaction already holds a read lock, this method releases the read lock
+     and waits until all other read locks have been released before acquiring the write lock.
+     @param tid the ID of the transaction requesting the write lock.
+     @throws InterruptedException if the thread is interrupted while waiting for the lock.
+     */
     public void writeLock(TransactionId tid) throws InterruptedException {
         if (this.lockusers.contains(tid) & this.isWrite) {
             return;
@@ -74,7 +109,15 @@ class ReadAndWriteLock {
         }
         this.lockwaiters.remove(tid);
     }
+    /**
 
+     Releases the lock held by the specified transaction, allowing other transactions to acquire the lock.
+     If the lock is held in write mode, the transaction must hold the write lock to release it.
+     If the lock is held in read mode, the transaction must hold a read lock to release it.
+     If the specified transaction does not hold the lock, this method does nothing.
+     After releasing the lock, this method notifies all waiting threads that the lock is available.
+     @param tid the ID of the transaction releasing the lock
+     */
     public void unlock(TransactionId tid) {
         if (isWrite){
             if (!lockusers.contains(tid)) {
@@ -100,10 +143,6 @@ class ReadAndWriteLock {
 
 }
 
-/**
- * LockManager keeps track of which locks each transaction holds and checks to see if a lock should be granted to a
- * transaction when it is requested.
- */
 public class LockManager {
     Map<PageId, ReadAndWriteLock> pageid_locks;
     public Map<TransactionId, Set<PageId>> tid_pageids;
@@ -193,7 +232,7 @@ public class LockManager {
         PageId[] page_array = new PageId[pages.size()];
         pages.toArray(page_array);
         for (PageId pageId: page_array) {
-            releaseLock(tid, ( pageId));
+            releaseLock(tid, pageId);
         }
         tid_pageids.remove(tid);
     }
